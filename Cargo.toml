@@ -22,3 +22,4 @@ appveyor = { repository = "mgattozzi/flcl", branch = "master", service = "github
 [dependencies]
 failure = "*"
 nom = "*"
+im = "*"

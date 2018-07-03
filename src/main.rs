@@ -2,6 +2,7 @@
 extern crate failure;
 #[macro_use]
 extern crate nom;
+extern crate im;
 
 pub mod ast;
 pub mod eval;

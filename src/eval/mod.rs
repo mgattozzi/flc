@@ -1,30 +1,35 @@
+mod state;
+
 use ast::Ast;
 use failure::Error;
 use ops::Op;
 use prim::Primitive;
+use self::state::State;
+
 
 pub fn evaluate(ast: Ast) -> Result<(), Error> {
+    let state = State::instantiate();
+
     for item in ast.code.into_iter() {
-        eval(item)?;
+        eval(item, state.clone())?;
     }
     Ok(())
 }
 
-fn eval(item: Primitive) -> Result<Primitive, Error> {
+fn eval(item: Primitive, st: State) -> Result<Primitive, Error> {
     match item {
         Primitive::Function {
             operation,
             arguments,
         } => {
-            let num_args = arguments.len();
-            let mut eval_args = Vec::new();
-            for arg in arguments {
-                eval_args.push(eval(arg)?);
-            }
             match operation {
                 Op::Add => {
-                    if num_args != 2 {
+                    if arguments.len() != 2 {
                         bail!("+ only takes two arguments");
+                    }
+                    let mut eval_args = Vec::new();
+                    for arg in arguments {
+                        eval_args.push(eval(arg, st.clone())?);
                     }
                     if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
                         Ok(Primitive::Number(a + b))
@@ -33,8 +38,12 @@ fn eval(item: Primitive) -> Result<Primitive, Error> {
                     }
                 }
                 Op::Div => {
-                    if num_args != 2 {
+                    if arguments.len() != 2 {
                         bail!("/ only takes two arguments");
+                    }
+                    let mut eval_args = Vec::new();
+                    for arg in arguments {
+                        eval_args.push(eval(arg, st.clone())?);
                     }
                     if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
                         Ok(Primitive::Number(a + b))
@@ -43,8 +52,12 @@ fn eval(item: Primitive) -> Result<Primitive, Error> {
                     }
                 }
                 Op::Mul => {
-                    if num_args != 2 {
+                    if arguments.len() != 2 {
                         bail!("* only takes two arguments");
+                    }
+                    let mut eval_args = Vec::new();
+                    for arg in arguments {
+                        eval_args.push(eval(arg, st.clone())?);
                     }
                     if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
                         Ok(Primitive::Number(a * b))
@@ -53,8 +66,12 @@ fn eval(item: Primitive) -> Result<Primitive, Error> {
                     }
                 }
                 Op::Sub => {
-                    if num_args != 2 {
+                    if arguments.len() != 2 {
                         bail!("- only takes two arguments");
+                    }
+                    let mut eval_args = Vec::new();
+                    for arg in arguments {
+                        eval_args.push(eval(arg, st.clone())?);
                     }
                     if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
                         Ok(Primitive::Number(a - b))
@@ -63,8 +80,12 @@ fn eval(item: Primitive) -> Result<Primitive, Error> {
                     }
                 }
                 Op::Pow => {
-                    if num_args != 2 {
+                    if arguments.len() != 2 {
                         bail!("^ only takes two arguments");
+                    }
+                    let mut eval_args = Vec::new();
+                    for arg in arguments {
+                        eval_args.push(eval(arg, st.clone())?);
                     }
                     if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
                         Ok(Primitive::Number(exponent(a,b)))
@@ -73,8 +94,12 @@ fn eval(item: Primitive) -> Result<Primitive, Error> {
                     }
                 }
                 Op::Mod => {
-                    if num_args != 2 {
+                    if arguments.len() != 2 {
                         bail!("% only takes two arguments");
+                    }
+                    let mut eval_args = Vec::new();
+                    for arg in arguments {
+                        eval_args.push(eval(arg, st.clone())?);
                     }
                     if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
                         Ok(Primitive::Number(a % b))
@@ -83,19 +108,33 @@ fn eval(item: Primitive) -> Result<Primitive, Error> {
                     }
                 }
                 Op::Print => {
+                    let mut eval_args = Vec::new();
+                    for arg in arguments {
+                        eval_args.push(eval(arg, st.clone())?);
+                    }
                     for i in eval_args {
                         print!("{}", i);
                     }
                     Ok(Primitive::AbsoluteUnit)
                 }
                 Op::PrintLn => {
+                    let mut eval_args = Vec::new();
+                    for arg in arguments {
+                        eval_args.push(eval(arg, st.clone())?);
+                    }
                     for i in eval_args {
                         print!("{}", i);
                     }
                     println!();
                     Ok(Primitive::AbsoluteUnit)
                 }
-                _ => bail!("I only support + - / % ^and * right now"),
+                Op::Def => {
+                    if arguments.len() != 2 {
+                        bail!("define only takes two arguments");
+                    }
+                    Ok(Primitive::AbsoluteUnit)
+                }
+                Op::User(_) => bail!("I only support inbuilt right now"),
             }
         }
         num @ Primitive::Number(_) => Ok(num),

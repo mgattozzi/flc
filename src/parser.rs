@@ -87,6 +87,7 @@ named!(op_parse<&str, Op>,
                 "^" => Op::Pow,
                 "print" => Op::Print,
                 "println" => Op::PrintLn,
+                "define" => Op::Def,
                 func => Op::User(func.to_string())
             }
         })
