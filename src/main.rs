@@ -9,6 +9,7 @@ pub mod eval;
 pub mod ops;
 pub mod parser;
 pub mod prim;
+pub mod special_form;
 
 use failure::Error;
 

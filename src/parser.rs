@@ -13,7 +13,7 @@ pub fn parse(file: &str) -> Result<Ast, Error> {
 
 named!(parse_input<&str, Ast>,
     do_parse!(
-        code: many0!(fn_parse) >>
+        code: many0!(alt!(spc_parse | fn_parse)) >>
         (Ast { code })
     )
 );
@@ -51,6 +51,28 @@ fn str_to_int(input: &str) -> Result<i64, <i64 as FromStr>::Err> {
     input.parse()
 }
 
+// Only parses define for now
+name!(spc_form<&str, SpecialForm>,
+    do_parse!(
+        take_while!(is_white_space) >>
+        form: take_until!(is_white_space) >>
+        take_while!(is_white_space) >>
+        ident: take_until!(is_white_space) >>
+        take_while!(is_white_space) >>
+        value: alt!(number_parse | fn_parser)
+    )
+);
+
+named!(spc_parse<&str, Primitive>,
+    complete!(do_parse!(
+        take_while!(is_white_space) >>
+        tag!("(") >>
+        spc: spc_form >>
+        tag!(")") >>
+        (Primitive::SpcForm(spc))
+    ))
+);
+
 named!(i64_parse<&str, i64>,
     do_parse!(
         take_while!(is_white_space) >>
@@ -87,7 +109,6 @@ named!(op_parse<&str, Op>,
                 "^" => Op::Pow,
                 "print" => Op::Print,
                 "println" => Op::PrintLn,
-                "define" => Op::Def,
                 func => Op::User(func.to_string())
             }
         })

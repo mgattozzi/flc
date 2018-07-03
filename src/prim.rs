@@ -1,4 +1,5 @@
 use ops::Op;
+use special_form::SpecialForm;
 use std::fmt;
 
 #[derive(Debug)]
@@ -9,6 +10,7 @@ pub enum Primitive {
     },
     Number(i64),
     Str(String),
+    SpcFm(SpecialForm),
     AbsoluteUnit
 }
 
@@ -28,6 +30,7 @@ impl fmt::Display for Primitive {
                 out.push(')');
                 out
             },
+            Primitive::SpcFm(fm) => fm.to_string(),
             Primitive::Str(string) => string.to_owned(),
             Primitive::Number(i64) => i64.to_string(),
             Primitive::AbsoluteUnit => "()".to_string(),
