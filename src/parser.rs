@@ -75,6 +75,8 @@ named!(op_parse<&str, Op>,
                 "*" => Op::Mul,
                 "%" => Op::Mod,
                 "^" => Op::Pow,
+                "print" => Op::Print,
+                "println" => Op::PrintLn,
                 func => Op::User(func.to_string())
             }
         })

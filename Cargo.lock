@@ -49,7 +49,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "flc"
+name = "flcl"
 version = "0.1.0"
 dependencies = [
  "failure 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",

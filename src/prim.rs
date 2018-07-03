@@ -8,6 +8,7 @@ pub enum Primitive {
         arguments: Vec<Primitive>,
     },
     Number(i64),
+    AbsoluteUnit
 }
 
 impl fmt::Display for Primitive {
@@ -27,6 +28,7 @@ impl fmt::Display for Primitive {
                 out
             }
             Primitive::Number(i64) => i64.to_string(),
+            Primitive::AbsoluteUnit => "()".to_string(),
         };
         write!(f, "{}", val)
     }

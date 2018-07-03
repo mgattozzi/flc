@@ -5,9 +5,7 @@ use prim::Primitive;
 
 pub fn evaluate(ast: Ast) -> Result<(), Error> {
     for item in ast.code.into_iter() {
-        let fn_str = item.to_string();
-        let i = eval(item)?;
-        println!("{} = {}", fn_str, i);
+        eval(item)?;
     }
     Ok(())
 }
@@ -23,52 +21,86 @@ fn eval(item: Primitive) -> Result<Primitive, Error> {
             for arg in arguments {
                 eval_args.push(eval(arg)?);
             }
-            if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
-                let value = match operation {
-                    Op::Add => {
-                        if num_args != 2 {
-                            bail!("+ only takes two arguments");
-                        }
-                        a + b
+            match operation {
+                Op::Add => {
+                    if num_args != 2 {
+                        bail!("+ only takes two arguments");
                     }
-                    Op::Div => {
-                        if num_args != 2 {
-                            bail!("/ only takes two arguments");
-                        }
-                        a / b
+                    if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
+                        Ok(Primitive::Number(a + b))
+                    } else {
+                        bail!("Unable to evaluate . Arg was not able to evaluate to a number");
                     }
-                    Op::Mul => {
-                        if num_args != 2 {
-                            bail!("* only takes two arguments");
-                        }
-                        a * b
+                }
+                Op::Div => {
+                    if num_args != 2 {
+                        bail!("/ only takes two arguments");
                     }
-                    Op::Sub => {
-                        if num_args != 2 {
-                            bail!("- only takes two arguments");
-                        }
-                        a - b
+                    if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
+                        Ok(Primitive::Number(a + b))
+                    } else {
+                        bail!("Unable to evaluate . Arg was not able to evaluate to a number");
                     }
-                    Op::Pow => {
-                        if num_args != 2 {
-                            bail!("^ only takes two arguments");
-                        }
-                        exponent(a, b)
+                }
+                Op::Mul => {
+                    if num_args != 2 {
+                        bail!("* only takes two arguments");
                     }
-                    Op::Mod => {
-                        if num_args != 2 {
-                            bail!("% only takes two arguments");
-                        }
-                        a % b
+                    if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
+                        Ok(Primitive::Number(a * b))
+                    } else {
+                        bail!("Unable to evaluate -. Arg was not able to evaluate to a number");
                     }
-                    _ => bail!("I only support + - / % ^and * right now"),
-                };
-                Ok(Primitive::Number(value))
-            } else {
-                bail!("I only support numbers in function args right now");
+                }
+                Op::Sub => {
+                    if num_args != 2 {
+                        bail!("- only takes two arguments");
+                    }
+                    if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
+                        Ok(Primitive::Number(a - b))
+                    } else {
+                        bail!("Unable to evaluate -. Arg was not able to evaluate to a number");
+                    }
+                }
+                Op::Pow => {
+                    if num_args != 2 {
+                        bail!("^ only takes two arguments");
+                    }
+                    if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
+                        Ok(Primitive::Number(exponent(a,b)))
+                    } else {
+                        bail!("Unable to evaluate ^. Arg was not able to evaluate to a number");
+                    }
+                }
+                Op::Mod => {
+                    if num_args != 2 {
+                        bail!("% only takes two arguments");
+                    }
+                    if let (&Primitive::Number(a), &Primitive::Number(b)) = (&eval_args[0], &eval_args[1]) {
+                        Ok(Primitive::Number(a % b))
+                    } else {
+                        bail!("Unable to evaluate %. Arg was not able to evaluate to a number");
+                    }
+                }
+                Op::Print => {
+                    if num_args != 1 {
+                        bail!("print only takes one argument");
+                    }
+                    print!("{}", &eval_args[0]);
+                    Ok(Primitive::AbsoluteUnit)
+                }
+                Op::PrintLn => {
+                    if num_args != 1 {
+                        bail!("print only takes one argument");
+                    }
+                    println!("{}", &eval_args[0]);
+                    Ok(Primitive::AbsoluteUnit)
+                }
+                _ => bail!("I only support + - / % ^and * right now"),
             }
         }
         num @ Primitive::Number(_) => Ok(num),
+        abs @ Primitive::AbsoluteUnit => Ok(abs),
     }
 }
 
