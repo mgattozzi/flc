@@ -1,30 +1,9 @@
-use std::fs;
-use std::fmt;
-use std::str::FromStr;
+use ast::Ast;
 use failure::Error;
-
-#[derive(Debug)]
-pub struct Ast {
-    pub code: Vec<Type>
-}
-
-#[derive(Debug)]
-pub enum Type {
-    Function {
-        operation: Op,
-        arguments: Vec<Type>
-    },
-    Number(i64),
-}
-
-#[derive(Debug)]
-pub enum Op {
-    Add,
-    Sub,
-    Mul,
-    Div,
-    User(String)
-}
+use ops::Op;
+use prim::Primitive;
+use std::fs;
+use std::str::FromStr;
 
 pub fn parse(file: &str) -> Result<Ast, Error> {
     let input = fs::read_to_string(file)?;
@@ -45,22 +24,13 @@ pub fn is_white_space(c: char) -> bool {
 
 pub fn is_num(c: char) -> bool {
     match c {
-        '0' |
-        '1' |
-        '2' |
-        '3' |
-        '4' |
-        '5' |
-        '6' |
-        '7' |
-        '8' |
-        '9' => true,
-        _ => false
+        '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => true,
+        _ => false,
     }
 }
 
-/// This only ever returns a Type::Function
-named!(fn_parse<&str, Type>,
+/// This only ever returns a Primitive::Function
+named!(fn_parse<&str, Primitive>,
     complete!(do_parse!(
         take_while!(is_white_space) >>
         tag!("(") >>
@@ -69,7 +39,7 @@ named!(fn_parse<&str, Type>,
         take_while!(is_white_space) >>
         arguments: many0!(number_parse) >>
         tag!(")") >>
-        (Type::Function {
+        (Primitive::Function {
             operation,
             arguments
         })
@@ -88,10 +58,10 @@ named!(i64_parse<&str, i64>,
     )
 );
 
-named!(number_parse<&str, Type>,
+named!(number_parse<&str, Primitive>,
     do_parse!(
         num: i64_parse >>
-        (Type::Number(num))
+        (Primitive::Number(num))
     )
 );
 named!(op_parse<&str, Op>,
@@ -108,34 +78,3 @@ named!(op_parse<&str, Op>,
         })
     )
 );
-
-impl fmt::Display for Op {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let val = match self {
-            Op::Add => "+",
-            Op::Sub => "-",
-            Op::Div => "/",
-            Op::Mul => "*",
-            Op::User(name) => &name,
-        };
-        write!(f, "{}", val)
-    }
-}
-
-impl fmt::Display for Type {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let val = match self {
-            Type::Function { operation, arguments } => {
-                let mut out = String::from("(");
-                out.push_str(&operation.to_string());
-                for i in arguments {
-                    out.push_str(&i.to_string());
-                }
-                out.push(')');
-                out
-            },
-            Type::Number(i64) => i64.to_string(),
-        };
-        write!(f, "{}", val)
-    }
-}

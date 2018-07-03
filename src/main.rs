@@ -1,11 +1,15 @@
-#[macro_use] extern crate failure;
-#[macro_use] extern crate nom;
+#[macro_use]
+extern crate failure;
+#[macro_use]
+extern crate nom;
 
-mod parser;
-mod eval;
+pub mod ast;
+pub mod eval;
+pub mod ops;
+pub mod parser;
+pub mod prim;
 
 use failure::Error;
-
 
 fn main() {
     if let Err(e) = run() {
