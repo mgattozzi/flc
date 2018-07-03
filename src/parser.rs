@@ -13,7 +13,7 @@ pub fn parse(file: &str) -> Result<Ast, Error> {
 
 named!(parse_input<&str, Ast>,
     do_parse!(
-        code: many1!(fn_parse) >>
+        code: many0!(fn_parse) >>
         (Ast { code })
     )
 );
@@ -37,7 +37,8 @@ named!(fn_parse<&str, Primitive>,
         take_while!(is_white_space) >>
         operation: op_parse >>
         take_while!(is_white_space) >>
-        arguments: many0!(alt!(number_parse | fn_parse)) >>
+        arguments: many0!(alt!(number_parse | fn_parse | str_parse)) >>
+        take_while!(is_white_space) >>
         tag!(")") >>
         (Primitive::Function {
             operation,
@@ -64,6 +65,15 @@ named!(number_parse<&str, Primitive>,
         (Primitive::Number(num))
     )
 );
+
+named!(str_parse<&str, Primitive>,
+    do_parse!(
+        take_while!(is_white_space) >>
+        string: delimited!(tag!("\""), take_until!("\""), tag!("\"")) >>
+        (Primitive::Str(string.into()))
+    )
+);
+
 named!(op_parse<&str, Op>,
     do_parse!(
         op: ws!(take_until!(" ")) >>

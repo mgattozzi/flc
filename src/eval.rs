@@ -83,23 +83,23 @@ fn eval(item: Primitive) -> Result<Primitive, Error> {
                     }
                 }
                 Op::Print => {
-                    if num_args != 1 {
-                        bail!("print only takes one argument");
+                    for i in eval_args {
+                        print!("{}", i);
                     }
-                    print!("{}", &eval_args[0]);
                     Ok(Primitive::AbsoluteUnit)
                 }
                 Op::PrintLn => {
-                    if num_args != 1 {
-                        bail!("print only takes one argument");
+                    for i in eval_args {
+                        print!("{}", i);
                     }
-                    println!("{}", &eval_args[0]);
+                    println!();
                     Ok(Primitive::AbsoluteUnit)
                 }
                 _ => bail!("I only support + - / % ^and * right now"),
             }
         }
         num @ Primitive::Number(_) => Ok(num),
+        string @ Primitive::Str(_) => Ok(string),
         abs @ Primitive::AbsoluteUnit => Ok(abs),
     }
 }
