@@ -1,7 +1,23 @@
 [package]
-name = "flc"
+name = "flcl"
 version = "0.1.0"
 authors = ["Michael Gattozzi <mgattozzi@gmail.com>"]
+description = "Fast Lisp Compiler/Lexer "
+documentation = "https://docs.rs/flcl"
+homepage = "https://github.com/mgattozzi/flcl"
+repository = "https://github.com/mgattozzi/flcl"
+readme = "README.md"
+keywords = ["flcl", "lisp", "eval", "language", "compiler"]
+categories = [
+  "text-processing",
+  "command-line-utilities",
+  "value-formatting"
+]
+license = "MIT/Apache-2.0"
+
+[badges]
+travis-ci = { repository = "mgattozzi/flcl", branch = "master" }
+appveyor = { repository = "mgattozzi/flcl", branch = "master", service = "github" }
 
 [dependencies]
 failure = "*"
