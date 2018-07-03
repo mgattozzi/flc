@@ -6,6 +6,8 @@ pub enum Op {
     Sub,
     Mul,
     Div,
+    Pow,
+    Mod,
     User(String),
 }
 
@@ -16,6 +18,8 @@ impl fmt::Display for Op {
             Op::Sub => "-",
             Op::Div => "/",
             Op::Mul => "*",
+            Op::Pow => "^",
+            Op::Mod => "%",
             Op::User(name) => &name,
         };
         write!(f, "{}", val)

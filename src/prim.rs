@@ -20,6 +20,7 @@ impl fmt::Display for Primitive {
                 let mut out = String::from("(");
                 out.push_str(&operation.to_string());
                 for i in arguments {
+                    out.push(' ');
                     out.push_str(&i.to_string());
                 }
                 out.push(')');

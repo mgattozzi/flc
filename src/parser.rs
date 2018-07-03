@@ -37,7 +37,7 @@ named!(fn_parse<&str, Primitive>,
         take_while!(is_white_space) >>
         operation: op_parse >>
         take_while!(is_white_space) >>
-        arguments: many0!(number_parse) >>
+        arguments: many0!(alt!(number_parse | fn_parse)) >>
         tag!(")") >>
         (Primitive::Function {
             operation,
@@ -73,6 +73,8 @@ named!(op_parse<&str, Op>,
                 "-" => Op::Sub,
                 "/" => Op::Div,
                 "*" => Op::Mul,
+                "%" => Op::Mod,
+                "^" => Op::Pow,
                 func => Op::User(func.to_string())
             }
         })
